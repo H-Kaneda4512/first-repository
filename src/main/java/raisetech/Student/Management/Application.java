@@ -14,38 +14,20 @@ public class Application {
     @Autowired
     private StudentRepository repository;
 
+    @Autowired
+    private StudentsCoursesRepository studentsCoursesRepository;
+
 	public static void main(String[] args) {
 
 		SpringApplication.run(Application.class, args);
 	}
-    @SuppressWarnings("unused")
-    @GetMapping("/student")
-    public String getStudent(@RequestParam String name) {
-        Student student = repository.searchByName(name);
-        return student.getName() + " " + student.getAge() + "歳";
-    }
 
-    @SuppressWarnings("unused")
-    @GetMapping("/students")
-    public List<Student>getAllStudents() {
-        return repository.findAll();
+    @GetMapping("/studentList")
+    public List<Student> getStudentList() {
+        return repository.search();
     }
-
-    @SuppressWarnings("unused")
-    @PostMapping("/student")
-    public void registerStudent(@RequestParam String name, @RequestParam int age) {
-      repository.registerStudent(name, age);
-    }
-
-    @SuppressWarnings("unused")
-    @PatchMapping("/student")
-    public void updateStudent(@RequestParam String name, @RequestParam int age) {
-      repository.updateStudent(name, age);
-    }
-
-    @SuppressWarnings("unused")
-    @DeleteMapping("/student")
-    public void deleteStudent(@RequestParam String name) {
-       repository.deleteStudent(name);
+    @GetMapping("/studentsCourses")
+    public List<StudentsCourses> getStudentsCourses() {
+        return studentsCoursesRepository.findAll();
     }
 }
