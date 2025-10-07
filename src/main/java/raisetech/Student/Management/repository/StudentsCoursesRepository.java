@@ -1,0 +1,16 @@
+package raisetech.Student.Management.repository;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+import raisetech.Student.Management.data.StudentsCourses;
+
+import java.util.List;
+
+@Mapper
+public interface StudentsCoursesRepository {
+
+    @Select("SELECT sc.id, sc.student_id, sc.course_name, s.name AS full_name, sc.course_start_at, sc.course_end_at " +
+            "FROM students_courses sc " +
+            "JOIN students s ON sc.student_id = s.id")
+    List<StudentsCourses> findAll();
+}
