@@ -1,5 +1,6 @@
 package raisetech.Student.Management.repository;
 
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import raisetech.Student.Management.data.StudentsCourses;
@@ -13,4 +14,8 @@ public interface StudentsCoursesRepository {
             "FROM students_courses sc " +
             "JOIN students s ON sc.student_id = s.id")
     List<StudentsCourses> findAll();
+
+    @Insert("INSERT INTO students_courses (id, student_id, course_name) " +
+            "VALUES (#{id}, #{studentId}, #{courseName})")
+    void insertCourse(StudentsCourses studentsCourses);
 }
