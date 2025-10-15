@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import raisetech.Student.Management.converter.StudentConverter;
 import raisetech.Student.Management.data.Student;
 import raisetech.Student.Management.data.StudentsCourses;
@@ -58,4 +55,21 @@ public class StudentController {
         return "redirect:/studentList";
     }
 
+    @GetMapping("/students/{id}")
+    public String editStudent(@PathVariable String id, Model model) {
+        Student student = service.getStudentById(id);
+        StudentDetail studentDetail = new StudentDetail();
+        studentDetail.setStudent(student);
+        model.addAttribute("studentDetail", studentDetail);
+        return "registerStudent";
+    }
+
+    @PostMapping("/updateStudent")
+    public String updateStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
+        if(result.hasErrors()) {
+            return "registerStudent";
+        }
+        service.updateStudent(studentDetail.getStudent());
+        return "redirect:/studentList";
+    }
 }
