@@ -3,9 +3,7 @@ package raisetech.Student.Management.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import raisetech.Student.Management.converter.StudentConverter;
 import raisetech.Student.Management.data.Student;
 import raisetech.Student.Management.data.StudentsCourses;
 import raisetech.Student.Management.domain.StudentDetail;
@@ -15,61 +13,37 @@ import java.util.List;
 @Controller
 public class StudentController {
 
-    private StudentService service;
-    private StudentConverter converter;
+    private final StudentService studentService;
 
     @Autowired
-    public StudentController(StudentService service, StudentConverter converter) {
-        this.service = service;
-        this.converter = converter;
+    public StudentController(StudentService studentService) {
+        this.studentService = studentService;
     }
 
     @GetMapping("/studentList")
-    public String getStudentList(Model model) {
-        List<Student> students = service.searchStudentList();
-        List<StudentsCourses> studentsCourses = service.searchStudentsCourseList();
-
-        model.addAttribute("studentList", converter.convertStudentDetails(students, studentsCourses));
+    public String showStudentList(Model model) {
+        model.addAttribute("students", studentService.searchStudentList());
         return "studentList";
-    }
-
-    @GetMapping("/studentsCourseList")
-    public List<StudentsCourses> getStudentsCourseList() {
-        return service.searchStudentsCourseList();
-    }
-
-    @GetMapping("/newStudent")
-    public String newStudent(Model model) {
-        model.addAttribute("studentDetail", new StudentDetail());
-        return "registerStudent";
-    }
-
-    @PostMapping("/registerStudent")
-    public String registerStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
-        if(result.hasErrors()) {
-            return "registerStudent";
-        }
-
-        service.registerStudentWithCourse(studentDetail);
-
-        return "redirect:/studentList";
     }
 
     @GetMapping("/students/{id}")
     public String editStudent(@PathVariable String id, Model model) {
-        Student student = service.getStudentById(id);
+        Student student = studentService.getStudentById(id);
+        List<StudentsCourses> courses = studentService.searchStudentsCourseList()
+                .stream()
+                .filter(c -> c.getStudentId().equals(id))
+                .toList();
         StudentDetail studentDetail = new StudentDetail();
         studentDetail.setStudent(student);
+        studentDetail.setStudentsCourses(courses);
         model.addAttribute("studentDetail", studentDetail);
-        return "registerStudent";
+        return "editStudent";
     }
 
     @PostMapping("/updateStudent")
-    public String updateStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
-        if(result.hasErrors()) {
-            return "registerStudent";
-        }
-        service.updateStudent(studentDetail.getStudent());
+    public String updateStudent(@ModelAttribute StudentDetail studentDetail) {
+        studentService.updateStudent(studentDetail.getStudent());
+        studentService.updateStudentsCourses(studentDetail.getStudentsCourses());
         return "redirect:/studentList";
     }
 }
